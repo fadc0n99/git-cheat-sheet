@@ -38,11 +38,42 @@
 
 ---
 
-```mermaid
-graph LR;
-  untracked -- "git add" --> staged;
-  staged    -- "???"     --> tracked/comitted;
+### Описание статусов файлов
 
-%% стрелка без текста для примера: 
-  A --> B;
+```mermaid
+stateDiagram-v2
+    [*] --> Untracked
+    Untracked --> Staged: git add
+    Staged --> Modified: git reset HEAD или изменения после add
+    Modified --> Staged: git add
+    Staged --> Committed: git commit
+    Committed --> Modified: редактирование файла
+    Modified --> Untracked: git rm --cached (если файл удалён из индекса)
+    Staged --> Untracked: git rm --cached + изменения (редко, но возможно)
+    Committed --> Staged: изменения + git add (после нового изменения)
+    Untracked --> [*]: файл удалён с диска (вне системы)
+
+    state "Untracked" as Untracked
+    state "Modified" as Modified
+    state "Staged" as Staged
+    state "Committed" as Committed
+
+    note right of Untracked
+      Файл существует в рабочей директории,
+      но не отслеживается Git'ом
+    end note
+
+    note right of Modified
+      Файл изменён по сравнению с последним коммитом,
+      но изменения ещё не добавлены в индекс
+    end note
+
+    note right of Staged
+      Изменения файла зафиксированы в индексе (staging area),
+      готовы к коммиту
+    end note
+
+    note right of Committed
+      Файл зафиксирован в истории репозитория
+    end note
 ``` 
